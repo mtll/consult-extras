@@ -61,35 +61,18 @@
     consult--source-register-locations
     consult--source-bookmark))
 
-(defvar consult--source-variables
-  (list :name "Variables"
-        :narrow ?v
-        :category 'helpful-variable
-        :items 'consult--variables
-        :action (lambda (name)
-                  (helpful-variable (intern name)))))
-
-(defvar consult--source-functions
-  (list :name "Functions"
-        :narrow ?f
-        :category 'helpful-function
-        :items 'consult--functions
-        :action (lambda (name)
-                  (helpful-function (intern name)))))
-
-(defvar consult--source-commands
-  (list :name "Commands"
-        :narrow ?c
-        :category 'helpful-command
-        :items 'consult--commands
-        :action (lambda (name)
-                  (helpful-function (intern name)))))
-
 (defun consult--mark-state ()
   (let ((jump-state
          (consult--state-with-return (consult--jump-preview) #'consult--jump)))
     (lambda (action cand)
       (funcall jump-state action (when cand (car (consult--get-location cand)))))))
+
+(defun consult--keymaps ()
+  (let (res)
+    (mapatoms (lambda (ob)
+                (when (and (boundp ob) (keymapp (symbol-value ob)))
+                  (push (symbol-name ob) res))))
+    res))
 
 (defun consult--variables ()
   (let (res)
@@ -122,11 +105,43 @@
 
 (defun consult-apropos ()
   (interactive)
-  (consult--multi '(consult--source-commands
-                    consult--source-functions
-                    consult--source-variables)
-                  :require-match t
-                  :prompt "Go to: "
-                  :sort nil))
+  (let (keymaps functions commands variables)
+    (mapatoms
+     (lambda (m)
+       (cond ((commandp m)
+              (push (symbol-name m) commands))
+             ((functionp m)
+              (push (symbol-name m) functions))
+             ((keymapp m)
+              (push (symbol-name m) keymaps))
+             ((helpful--variable-p m)
+              (push (symbol-name m) variables)))))
+    (consult--multi `((:name "Commands"
+                             :narrow ?c
+                             :category function
+                             :items ,commands
+                             :action ,(lambda (name)
+                                        (helpful-function (intern name))))
+                      (:name "Functions"
+                             :narrow ?f
+                             :category function
+                             :items ,functions
+                             :action ,(lambda (name)
+                                        (helpful-function (intern name))))
+                      (:name "Variables"
+                             :narrow ?v
+                             :category variable
+                             :items ,variables
+                             :action ,(lambda (name)
+                                        (helpful-variable (intern name))))
+                      (:name "Keymaps"
+                             :narrow ?k
+                             :category symbol
+                             :items ,keymaps
+                             :action ,(lambda (name)
+                                        (describe-keymap (intern name)))))
+                    :require-match t
+                    :prompt "Go to: "
+                    :sort nil)))
 
 (provide 'consult-extras)
