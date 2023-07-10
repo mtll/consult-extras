@@ -1,3 +1,6 @@
+;; -*- lexical-binding: t -*-
+;; completion query
+
 (require 'consult)
 (require 'helpful)
 
@@ -110,7 +113,7 @@
      (lambda (m)
        (cond ((commandp m)
               (push (symbol-name m) commands))
-             ((functionp m)
+             ((fboundp m)
               (push (symbol-name m) functions))
              ((keymapp m)
               (push (symbol-name m) keymaps))
@@ -121,7 +124,7 @@
                              :category function
                              :items ,commands
                              :action ,(lambda (name)
-                                        (helpful-function (intern name))))
+                                        (helpful-command (intern name))))
                       (:name "Functions"
                              :narrow ?f
                              :category function
@@ -141,7 +144,7 @@
                              :action ,(lambda (name)
                                         (describe-keymap (intern name)))))
                     :require-match t
-                    :prompt "Go to: "
-                    :sort nil)))
+                    :prompt "Describe: "
+                    :sort 'string<)))
 
 (provide 'consult-extras)
