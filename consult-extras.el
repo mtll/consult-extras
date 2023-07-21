@@ -101,10 +101,17 @@
 
 (defun consult-all-marks ()
   (interactive)
-  (consult--multi consult-saved-locations-sources
-                  :require-match t
-                  :prompt "Go to: "
-                  :sort nil))
+  (let ((win (selected-window))
+        (pt (point-marker))
+        cand)
+    (condition-case nil
+        (consult--multi consult-saved-locations-sources
+                        :require-match t
+                        :prompt "Go to: "
+                        :sort nil)
+      (quit (with-selected-window win
+              (set-window-buffer (selected-window) (marker-buffer pt))
+              (goto-char pt))))))
 
 (defun consult-apropos ()
   (interactive)
