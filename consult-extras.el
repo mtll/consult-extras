@@ -84,7 +84,7 @@
               (set-window-buffer (selected-window) (marker-buffer pt))
               (goto-char pt))))))
 
-(defun consult-apropos ()
+(defun consult-symbol ()
   (interactive)
   (let (keymaps functions commands variables)
     (mapatoms
@@ -97,32 +97,33 @@
               (push (symbol-name m) keymaps))
              ((helpful--variable-p m)
               (push (symbol-name m) variables)))))
-    (consult--multi `((:name "Commands"
-                             :narrow ?c
-                             :category function
-                             :items ,commands
-                             :action ,(lambda (name)
-                                        (helpful-command (intern name))))
-                      (:name "Functions"
-                             :narrow ?f
-                             :category function
-                             :items ,functions
-                             :action ,(lambda (name)
-                                        (helpful-function (intern name))))
-                      (:name "Variables"
-                             :narrow ?v
-                             :category variable
-                             :items ,variables
-                             :action ,(lambda (name)
-                                        (helpful-variable (intern name))))
-                      (:name "Keymaps"
-                             :narrow ?k
-                             :category symbol
-                             :items ,keymaps
-                             :action ,(lambda (name)
-                                        (describe-keymap (intern name)))))
-                    :require-match t
-                    :prompt "Describe: "
-                    :sort 'string<)))
+    (consult--multi
+     `((:name "Functions"
+              :narrow ?f
+              :category function
+              :items ,functions
+              :action ,(lambda (name)
+                         (helpful-function (intern name))))
+       (:name "Commands"
+              :narrow ?c
+              :category function
+              :items ,commands
+              :action ,(lambda (name)
+                         (helpful-command (intern name))))
+       (:name "Variables"
+              :narrow ?v
+              :category variable
+              :items ,variables
+              :action ,(lambda (name)
+                         (helpful-variable (intern name))))
+       (:name "Keymaps"
+              :narrow ?k
+              :category symbol
+              :items ,keymaps
+              :action ,(lambda (name)
+                         (describe-keymap (intern name)))))
+     :require-match t 
+     :prompt "Describe: "
+     :sort 'string<)))
 
 (provide 'consult-extras)
