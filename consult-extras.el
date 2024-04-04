@@ -1,19 +1,33 @@
-;; -*- lexical-binding: t -*-
-;; completion query
+;;; consult-extras.el --- Modal keybinding mode -*- lexical-binding: t -*-
+;;
+;; Filename: consult-extras.el
+;; Description: A few extra consult sources
+;; Author: David Feller
+;; Package-Version: 0.0
+;; Package-Requires: ((emacs "29.1") (compat "29.1.4.4") consult conn-mode helpful)
+;;
+;; This program is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 3, or (at your option)
+;; any later version.
+;;
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+;; GNU General Public License for more details.
+;;
+;; You should have received a copy of the GNU General Public License
+;; along with this program.  If not, see <https://www.gnu.org/licenses/>.
+;;
+;;; Commentary:
+;;
+;; A few extra consult sources
+;;
+;;; Code:
 
 (require 'consult)
-
-(defvar consult--source-tab-bar
-  `(:name "Tab Bar"
-          :narrow ?t
-          :category tab-bar
-          :items ,(lambda ()
-                    (mapcar (lambda (tab-name)
-                              (alist-get 'name tab-name))
-                            (tab-bar--tabs-recent)))
-          :action ,#'tab-bar-switch-to-tab
-          :new ,#'conn-tab-bar-new-named-tab))
-(add-to-list 'consult-buffer-sources 'consult--source-tab-bar 'append)
+(require 'conn-mode)
+(require 'helpful)
 
 (defvar consult--source-mark-ring
   (list :name "Mark Ring"
@@ -72,8 +86,7 @@
 (defun consult-all-marks ()
   (interactive)
   (let ((win (selected-window))
-        (pt (point-marker))
-        cand)
+        (pt (point-marker)))
     (condition-case nil
         (consult--multi consult-saved-locations-sources
                         :require-match t
