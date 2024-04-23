@@ -26,7 +26,7 @@
 ;;; Code:
 
 (require 'consult)
-(require 'conn-mode)
+(require 'conn)
 (require 'helpful)
 
 (defvar consult--source-mark-ring
