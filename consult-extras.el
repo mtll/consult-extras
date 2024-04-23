@@ -4,7 +4,7 @@
 ;; Description: A few extra consult sources
 ;; Author: David Feller
 ;; Package-Version: 0.0
-;; Package-Requires: ((emacs "29.1") (compat "29.1.4.4") consult conn-mode helpful)
+;; Package-Requires: ((emacs "29.1") (compat "29.1.4.4") consult conn helpful)
 ;;
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
